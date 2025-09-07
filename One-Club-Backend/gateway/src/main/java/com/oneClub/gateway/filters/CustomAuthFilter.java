@@ -32,7 +32,10 @@ public class CustomAuthFilter implements GlobalFilter, Ordered {
         log.info("[Gateway] Incoming request: {}", request.getURI());
         log.debug("[Gateway] Request headers: {}", request.getHeaders());
 
-        if (path.startsWith("/auth/") || path.startsWith("/eureka") || path.startsWith("/actuator")) {
+        if ((path.equals("/products") && request.getMethod().toString().equals("GET"))
+                ||path.startsWith("/auth/")
+                || path.startsWith("/eureka")
+                || path.startsWith("/actuator")) {
             log.debug("[Gateway] Skipping auth for path: {}", path);
             return chain.filter(exchange);
         }
