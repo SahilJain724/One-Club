@@ -1,6 +1,5 @@
 package com.oneClub.auth_service.feignClients;
 
-
 import com.oneClub.auth_service.dtos.LoginDTO;
 import com.oneClub.auth_service.dtos.RegisterDTO;
 import com.oneClub.auth_service.dtos.RegisterVendorDTO;

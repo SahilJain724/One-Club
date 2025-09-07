@@ -1,6 +1,6 @@
 package com.oneClub.product_inventory_service.services;
 import com.oneClub.product_inventory_service.dtos.ProductResponseDTO;
-import com.oneClub.product_inventory_service.mappers.ProductMapper;
+import com.oneClub.product_inventory_service.mappers.Mappers;
 import com.oneClub.product_inventory_service.models.Favourite;
 import com.oneClub.product_inventory_service.repositories.FavouriteRepository;
 import com.oneClub.product_inventory_service.repositories.ProductRepository;
@@ -22,7 +22,7 @@ public class FavouritesService {
         List<Favourite> favs = favouriteRepository.findByUserId(userId);
         return favs.stream()
                 .map(fav -> productRepository.findById(fav.getProdId())
-                        .map(ProductMapper::toDTO)
+                        .map(Mappers::toDTO)
                         .orElse(null))
                 .filter(Objects::nonNull)
                 .toList();
@@ -40,13 +40,13 @@ public class FavouritesService {
         Optional<Favourite> existing = favouriteRepository.findByUserIdAndProdId(userId, prodId);
         if (existing.isPresent()) {
             favouriteRepository.deleteById(existing.get().getFavId());
-            return false; // removed
+            return false;
         } else {
             Favourite fav = new Favourite();
             fav.setUserId(userId);
             fav.setProdId(prodId);
             favouriteRepository.save(fav);
-            return true; // added
+            return true;
         }
     }
 }

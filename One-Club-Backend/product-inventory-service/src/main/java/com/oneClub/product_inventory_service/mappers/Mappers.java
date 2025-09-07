@@ -1,6 +1,7 @@
 package com.oneClub.product_inventory_service.mappers;
 
 import com.oneClub.product_inventory_service.dtos.AdminProductResponseDTO;
+import com.oneClub.product_inventory_service.dtos.InventoryResponseDTO;
 import com.oneClub.product_inventory_service.dtos.ProductRequestDTO;
 import com.oneClub.product_inventory_service.dtos.ProductResponseDTO;
 import com.oneClub.product_inventory_service.models.Category;
@@ -9,9 +10,9 @@ import com.oneClub.product_inventory_service.models.Product;
 import com.oneClub.product_inventory_service.models.Subcategory;
 
 
-public class ProductMapper {
+public class Mappers {
 
-    // Convert DTO to Entity (including inventory)
+
     public static Product toEntity(ProductRequestDTO dto, Category category, Subcategory subcategory) {
         Product product = new Product();
         product.setTitle(dto.getTitle());
@@ -54,5 +55,20 @@ public class ProductMapper {
                 dto,
                 product.getInventory().getUnitsSold(),
                 product.getInventory().getVendorId());
+    }
+
+     public static InventoryResponseDTO toInventoryResponseDTO(Inventory inventory) {
+        return new InventoryResponseDTO(
+                inventory.getProductId(),
+                inventory.getProduct().getTitle(),
+                inventory.getProduct().getPrice(),
+                inventory.getProduct().getDescription(),
+                inventory.getProduct().getImage(),
+                inventory.getProduct().getRating(),
+                inventory.getProduct().getGender(),
+                inventory.getProduct().getCategory().getCategoryName(),
+                inventory.getProduct().getSubcategory().getSubcategoryName(),
+                inventory.getQuantity()
+        );
     }
 }

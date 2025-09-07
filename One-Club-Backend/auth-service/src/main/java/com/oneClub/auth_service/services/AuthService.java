@@ -54,9 +54,6 @@ public class AuthService {
 
     }
 
-    private boolean isCompanyEmail(String email) {
-        return email.toLowerCase().endsWith("@oneclub.com");
-    }
 
     public Map<String, String> login(LoginDTO dto) {
         UserDTO user = userServiceClient.validateLogin(dto).getBody();
@@ -89,4 +86,9 @@ public class AuthService {
         log.info("Generated token for userId: {}, username: {}, role: {}", userId, username, role);
         return token;
     }
+
+    private boolean isCompanyEmail(String email) {
+        return email.toLowerCase().endsWith("@oneclub.com");
+    }
+
 }

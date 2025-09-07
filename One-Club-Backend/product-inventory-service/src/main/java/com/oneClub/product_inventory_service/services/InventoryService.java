@@ -2,7 +2,7 @@ package com.oneClub.product_inventory_service.services;
 
 import com.oneClub.product_inventory_service.dtos.InventoryResponseDTO;
 import com.oneClub.product_inventory_service.dtos.VendorUnitsSoldDTO;
-import com.oneClub.product_inventory_service.mappers.InventoryMapper;
+import com.oneClub.product_inventory_service.mappers.Mappers;
 import com.oneClub.product_inventory_service.models.Inventory;
 import com.oneClub.product_inventory_service.repositories.InventoryRepository;
 import lombok.RequiredArgsConstructor;
@@ -20,13 +20,13 @@ public class InventoryService {
 
     public List<InventoryResponseDTO> getAllInventory() {
         return inventoryRepo.findAll().stream()
-                .map(InventoryMapper::mapToDTO)
+                .map(Mappers::toInventoryResponseDTO)
                 .collect(Collectors.toList());
     }
 
     public InventoryResponseDTO getInventoryByProductId(Integer prodId) {
         return inventoryRepo.findById(prodId)
-                .map(InventoryMapper::mapToDTO)
+                .map(Mappers::toInventoryResponseDTO)
                 .orElse(null);
     }
 
@@ -35,7 +35,7 @@ public class InventoryService {
         if (current == null) return null;
         current.setQuantity(current.getQuantity()-quantity); // overwrites quantity
         inventoryRepo.save(current);
-        return InventoryMapper.mapToDTO(current);
+        return Mappers.toInventoryResponseDTO(current);
     }
 
     public Integer checkQuantityById(Integer prodId) {

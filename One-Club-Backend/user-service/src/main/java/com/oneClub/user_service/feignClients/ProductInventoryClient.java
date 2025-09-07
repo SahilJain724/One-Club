@@ -1,6 +1,5 @@
 package com.oneClub.user_service.feignClients;
 
-import com.oneClub.user_service.dtos.ProductResponseDTO;
 import com.oneClub.user_service.dtos.VendorUnitsSoldDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.DeleteMapping;

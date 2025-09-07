@@ -1,6 +1,5 @@
 package com.oneClub.user_service.dtos;
 
-
 import lombok.*;
 
 @Data
