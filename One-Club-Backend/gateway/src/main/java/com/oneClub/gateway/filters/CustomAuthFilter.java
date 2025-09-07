@@ -47,7 +47,7 @@ public class CustomAuthFilter implements GlobalFilter, Ordered {
             String token = authHeader.substring(7);
             log.info("[Gateway] JWT token received");
 
-            jwtService.debugToken(token); // Optional: prints detailed breakdown
+            jwtService.debugToken(token); //prints detailed breakdown
 
             String email = jwtService.extractUserName(token);
             String role = jwtService.extractRole(token);
