@@ -1,0 +1,247 @@
+services:
+  # ================== DATABASES ==================
+  users-db:
+    image: mysql:8.0
+    container_name: users-db
+    environment:
+      MYSQL_ROOT_PASSWORD: "Sahil@123"
+      MYSQL_DATABASE: users_db
+    ports:
+      - "3307:3306"
+    volumes:
+      - users_db_data:/var/lib/mysql
+    networks:
+      - oneclub-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-pSahil@123"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  orders-db:
+    image: mysql:8.0
+    container_name: orders-db
+    environment:
+      MYSQL_ROOT_PASSWORD: "Sahil@123"
+      MYSQL_DATABASE: orders_db
+    ports:
+      - "3308:3306"
+    volumes:
+      - orders_db_data:/var/lib/mysql
+    networks:
+      - oneclub-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-pSahil@123"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  payments-db:
+    image: mysql:8.0
+    container_name: payments-db
+    environment:
+      MYSQL_ROOT_PASSWORD: "Sahil@123"
+      MYSQL_DATABASE: payments_db
+    ports:
+      - "3309:3306"
+    volumes:
+      - payments_db_data:/var/lib/mysql
+    networks:
+      - oneclub-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-pSahil@123"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  product-inventory-db:
+    image: mysql:8.0
+    container_name: product-inventory-db
+    environment:
+      MYSQL_ROOT_PASSWORD: "Sahil@123"
+      MYSQL_DATABASE: products_inventory_db
+    ports:
+      - "3310:3306"
+    volumes:
+      - products_inventory_db_data:/var/lib/mysql
+    networks:
+      - oneclub-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-pSahil@123"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  cart-db:
+    image: mysql:8.0
+    container_name: cart-db
+    environment:
+      MYSQL_ROOT_PASSWORD: "Sahil@123"
+      MYSQL_DATABASE: carts_db
+    ports:
+      - "3311:3306"
+    volumes:
+      - carts_db_data:/var/lib/mysql
+    networks:
+      - oneclub-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-pSahil@123"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  # ================== INFRA ==================
+  service-registry:
+    image: sahilxlr8/service-registry:0.0.1-SNAPSHOT
+    container_name: service-registry
+    ports:
+      - "8761:8761"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+    networks:
+      - oneclub-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8761/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  zipkin:
+    image: openzipkin/zipkin
+    container_name: zipkin
+    ports:
+      - "9411:9411"
+    networks:
+      - oneclub-network
+
+  # ================== MICROSERVICES ==================
+  user-service:
+    image: sahilxlr8/user-service:0.0.1-SNAPSHOT
+    container_name: user-service
+    depends_on:
+      users-db:
+        condition: service_healthy
+      service-registry:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://users-db:3306/users_db?autoReconnect=true&allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: Sahil@123
+      SPRING_PROFILES_ACTIVE: docker
+    networks:
+      - oneclub-network
+
+  product-inventory-service:
+    image: sahilxlr8/product-inventory-service:0.0.1-SNAPSHOT
+    container_name: product-inventory-service
+    depends_on:
+      product-inventory-db:
+        condition: service_healthy
+      service-registry:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://product-inventory-db:3306/products_inventory_db?autoReconnect=true&allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: Sahil@123
+      SPRING_PROFILES_ACTIVE: docker
+    networks:
+      - oneclub-network
+
+  cart-service:
+    image: sahilxlr8/cart-service:0.0.1-SNAPSHOT
+    container_name: cart-service
+    depends_on:
+      cart-db:
+        condition: service_healthy
+      service-registry:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://cart-db:3306/carts_db?autoReconnect=true&allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: Sahil@123
+      SPRING_PROFILES_ACTIVE: docker
+    networks:
+      - oneclub-network
+
+  orders-service:
+    image: sahilxlr8/orders-service:0.0.1-SNAPSHOT
+    container_name: orders-service
+    depends_on:
+      orders-db:
+        condition: service_healthy
+      service-registry:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://orders-db:3306/orders_db?autoReconnect=true&allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: Sahil@123
+      SPRING_PROFILES_ACTIVE: docker
+    networks:
+      - oneclub-network
+
+  payments-service:
+    image: sahilxlr8/payments-service:0.0.1-SNAPSHOT
+    container_name: payments-service
+    depends_on:
+      payments-db:
+        condition: service_healthy
+      service-registry:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://payments-db:3306/payments_db?autoReconnect=true&allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: Sahil@123
+      SPRING_PROFILES_ACTIVE: docker
+    networks:
+      - oneclub-network
+
+  auth-service:
+    image: sahilxlr8/auth-service:0.0.1-SNAPSHOT
+    container_name: auth-service
+    depends_on:
+      users-db:
+        condition: service_healthy
+      service-registry:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://users-db:3306/users_db?autoReconnect=true&allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: Sahil@123
+      SPRING_PROFILES_ACTIVE: docker
+    networks:
+      - oneclub-network
+
+  gateway:
+    image: sahilxlr8/gateway:0.0.1-SNAPSHOT
+    container_name: gateway
+    ports:
+      - "9000:9000"
+    depends_on:
+      service-registry:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://users-db:3306/users_db?autoReconnect=true&allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: Sahil@123
+      SPRING_PROFILES_ACTIVE: docker
+    networks:
+      - oneclub-network
+
+# ================== VOLUMES ==================
+volumes:
+  users_db_data:
+  orders_db_data:
+  payments_db_data:
+  products_inventory_db_data:
+  carts_db_data:
+
+# ================== NETWORK ==================
+networks:
+  oneclub-network:
+    driver: bridge
