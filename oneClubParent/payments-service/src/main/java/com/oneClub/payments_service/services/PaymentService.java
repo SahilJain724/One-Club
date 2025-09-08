@@ -32,9 +32,7 @@ public class PaymentService {
     @Value("${razorpay.api.secret}")
     private String apiSecret;
 
-    /**
-     * Creates a new payment order in Razorpay, saves in DB, returns payment response DTO.
-     */
+
     public PaymentResponseDTO createPayment(PaymentRequestDTO dto) throws RazorpayException {
         RazorpayClient razorpayClient = new RazorpayClient(apiKey, apiSecret);
 
@@ -51,12 +49,6 @@ public class PaymentService {
         return PaymentMapper.toDTO(payment);
     }
 
-    /**
-     * Handles payment success:
-     * - Updates payment with Razorpay payment ID
-     * - Notifies order service to mark order as PAID & confirm stock
-     * - Clears user's cart
-     */
     @Transactional
     public void handlePaymentSuccess(Integer userId, String roles, Integer paymentId, String razorpayPaymentId) {
 
@@ -77,19 +69,15 @@ public class PaymentService {
     }
 
 
-    /**
-     * Handles payment failure:
-     * - Notifies order service to cancel order and release reserved stock
-     */
+
     @Transactional
     public void handlePaymentFailed(String roles, Integer paymentId) {
         Payment payment = paymentRepository.findById(paymentId)
                 .orElseThrow(() -> new IllegalArgumentException("Payment not found with ID: " + paymentId));
 
-        // notify order service to cancel and delete order
+
         orderServiceClient.handlePaymentFailed(payment.getOrderId(), roles);
 
-        // optionally: mark payment as failed or delete payment record
-        // paymentRepository.delete(payment);
+
     }
 }

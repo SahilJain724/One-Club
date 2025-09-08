@@ -3,6 +3,7 @@ package com.oneClub.user_service.controllers;
 import com.oneClub.user_service.dtos.*;
 import com.oneClub.user_service.models.Address;
 import com.oneClub.user_service.models.User;
+import com.oneClub.user_service.services.AddressService;
 import com.oneClub.user_service.services.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -17,15 +18,16 @@ import java.util.List;
 public class UserController {
 
     private final UserService userService;
+    private final AddressService addressService;
 
     @GetMapping("/addresses")
     public ResponseEntity<List<Address>> getAllAddresses(@RequestHeader("X-User-Id") Integer userId) {
-        return ResponseEntity.ok(userService.getAllAddresses(userId));
+        return ResponseEntity.ok(addressService.getAllAddresses(userId));
     }
 
     @GetMapping("address/{addressId}")
     public ResponseEntity<AddressResponseDTO> getAddressById(@PathVariable Integer addressId) {
-        AddressResponseDTO addressResponseDTO = userService.getAddressById(addressId);
+        AddressResponseDTO addressResponseDTO = addressService.getAddressById(addressId);
         if (addressResponseDTO == null)
             return ResponseEntity.notFound().build();
         else
@@ -37,18 +39,18 @@ public class UserController {
             @RequestHeader("X-User-Id") Integer userId,
             @RequestBody AddressRequestDTO dto) {
 
-        return ResponseEntity.ok(userService.addAddress(userId, dto));
+        return ResponseEntity.ok(addressService.addAddress(userId, dto));
     }
 
     @PatchMapping("/update/address")
     public ResponseEntity<HttpStatus> updateAddress(@RequestBody AddressRequestDTO addressRequestDTO) {
-        return ResponseEntity.ok(userService.updateAddress(addressRequestDTO));
+        return ResponseEntity.ok(addressService.updateAddress(addressRequestDTO));
     }
 
     @DeleteMapping("/delete/address/{addressId}")
     public ResponseEntity<HttpStatus> deleteAddress(@PathVariable Integer addressId) {
 
-        return new ResponseEntity<>(userService.deleteAddressById(addressId)); // 204 No Content
+        return new ResponseEntity<>(addressService.deleteAddressById(addressId)); // 204 No Content
     }
 
     @PatchMapping("/address/set-default/{addressId}")
@@ -56,7 +58,7 @@ public class UserController {
             @RequestHeader("X-User-Id") Integer userId,
             @PathVariable Integer addressId) {
 
-        HttpStatus status = userService.setDefaultAddress(userId, addressId);
+        HttpStatus status = addressService.setDefaultAddress(userId, addressId);
         return new ResponseEntity<>(status);
     }
 

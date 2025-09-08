@@ -3,7 +3,7 @@ package com.oneClub.product_inventory_service.services;
 import com.oneClub.product_inventory_service.dtos.AdminProductResponseDTO;
 import com.oneClub.product_inventory_service.dtos.ProductRequestDTO;
 import com.oneClub.product_inventory_service.dtos.ProductResponseDTO;
-import com.oneClub.product_inventory_service.mappers.ProductMapper;
+import com.oneClub.product_inventory_service.mappers.Mappers;
 import com.oneClub.product_inventory_service.models.Category;
 import com.oneClub.product_inventory_service.models.Inventory;
 import com.oneClub.product_inventory_service.models.Product;
@@ -33,19 +33,19 @@ public class ProductService {
     public List<ProductResponseDTO> getProducts() {
         return prodRepo.findAll()
                 .stream()
-                .map(ProductMapper::toDTO)
+                .map(Mappers::toDTO)
                 .collect(Collectors.toList());
     }
 
     public List<AdminProductResponseDTO> getAdminProducts() {
         return prodRepo.findAll()
                 .stream()
-                .map(ProductMapper::toAdminDTO).collect(Collectors.toList());
+                .map(Mappers::toAdminDTO).collect(Collectors.toList());
     }
 
     public ProductResponseDTO getProductById(Integer prodId) {
         return prodRepo.findById(prodId)
-                .map(ProductMapper::toDTO)
+                .map(Mappers::toDTO)
                 .orElse(null);
     }
 
@@ -56,7 +56,7 @@ public class ProductService {
         Subcategory subcategory = subcategoryRepo.findById(dto.getSubcategoryId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Subcategory not found"));
 
-        Product product = ProductMapper.toEntity(dto, category, subcategory);
+        Product product = Mappers.toEntity(dto, category, subcategory);
 
         Inventory inventory = new Inventory();
         inventory.setQuantity(dto.getQuantity());
@@ -65,7 +65,7 @@ public class ProductService {
 
         product.setInventory(inventory);
         prodRepo.save(product);
-        return ProductMapper.toDTO(product);
+        return Mappers.toDTO(product);
     }
 
     public ProductResponseDTO updateProduct(Integer prodId, ProductRequestDTO dto) {
@@ -95,7 +95,7 @@ public class ProductService {
         inventoryRepository.save(inventory);
 
         prodRepo.save(currentProd);
-        return ProductMapper.toDTO(currentProd);
+        return Mappers.toDTO(currentProd);
     }
 
     @Transactional
@@ -105,7 +105,7 @@ public class ProductService {
 
         prodRepo.delete(product);
 
-        return ProductMapper.toDTO(product);
+        return Mappers.toDTO(product);
     }
 
     @Transactional
@@ -125,7 +125,7 @@ public class ProductService {
     public List<AdminProductResponseDTO> getProductsByVendorId(Integer vendorId) {
         return prodRepo.findAllByInventoryVendorId(vendorId)
                 .stream()
-                .map(ProductMapper::toAdminDTO)
+                .map(Mappers::toAdminDTO)
                 .collect(Collectors.toList());
     }
 
